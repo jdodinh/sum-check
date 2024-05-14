@@ -1,5 +1,4 @@
 mod protocol;
-mod polynomial;
 mod field;
 
 fn main() {
