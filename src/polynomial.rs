@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use ark_ff::Field;
+use std::ops::Mul;
 use ark_poly::{multivariate::{SparsePolynomial, SparseTerm, Term}, DenseMVPolynomial, Polynomial};
 
 use ark_std::{UniformRand};
@@ -8,7 +10,24 @@ use crate::field::Field64 as F;
 
 pub type MLPolynomial = SparsePolynomial<F, SparseTerm>;
 
-pub type LinearDescription = (F,F);
+pub type PolynomialDescription = Vec<F>;
+
+pub type MVMLPolynomial = Vec<MLPolynomial>;
+
+
+pub fn evaluate_mvml_polynomial(mvml_polynomial: MVMLPolynomial, point: &Vec<F>) -> F {
+    mvml_polynomial.iter().map(|ml_polynomial|ml_polynomial.evaluate(&point)).fold(F::ONE, F::mul)
+}
+
+pub fn get_num_vars(multilinears: &MVMLPolynomial) -> Option<usize> {
+    match multilinears.as_slice() {
+        [head, tail @ ..] => tail
+            .iter()
+            .all(|x| x.num_vars == head.num_vars)
+            .then(|| head.num_vars),
+        [] => None,
+    }
+}
 
 pub fn evaluate_polynomial_on_hypercube(p: &MLPolynomial) -> HashMap<String, F> {
     let num_vars = p.num_vars();
@@ -68,7 +87,6 @@ mod tests {
             poly1.evaluate(&random_point),
             poly2.evaluate(&random_point)
         );
-
     }
 
     #[test]
@@ -137,5 +155,4 @@ mod tests {
         assert_eq!(some_point, bit_string_to_vector(binary_point));
         assert_eq!(*value_from_map, value_from_poly)
     }
-
 }
