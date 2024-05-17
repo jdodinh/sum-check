@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::ops::{Add, Mul, Sub};
-use ark_poly::{multivariate::{SparsePolynomial, SparseTerm, Term}, DenseMVPolynomial};
+use ark_poly::multivariate::{SparsePolynomial, SparseTerm};
 use crate::field::Field64 as F;
 use crate::polynomial::*;
 
@@ -15,18 +15,18 @@ pub struct Prover {
 
 impl Prover {
 
-    pub fn claim_sum(poly: &SparsePolynomial<F, SparseTerm>) -> (F, ProverState) {
+    pub fn claim_sum(poly: &MLPolynomial) -> (F, ProverState) {
         let initial_state = ProverState {
             last_round: 0,
             poly: poly.clone(),
-            map: evaluate_polynomial_on_hypercube(poly),
+            map: evaluate_polynomial_on_hypercube(&poly),
         };
         let claim = initial_state.map.iter().fold(F::from(0), |acc, (_, v)| acc.add(v));
         return (claim, initial_state)
 
     }
 
-    pub fn round_phase_1(state: ProverState) -> ((F, F), ProverState) {
+    pub fn round_phase_1(state: ProverState) -> (LinearDescription, ProverState) {
         let (p0, p1) = collapse_map(&state.map);
         ((p0, p1), state)
     }

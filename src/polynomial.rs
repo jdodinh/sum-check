@@ -6,7 +6,11 @@ use rand::{thread_rng};
 
 use crate::field::Field64 as F;
 
-pub fn evaluate_polynomial_on_hypercube(p: &SparsePolynomial<F, SparseTerm>) -> HashMap<String, F> {
+pub type MLPolynomial = SparsePolynomial<F, SparseTerm>;
+
+pub type LinearDescription = (F,F);
+
+pub fn evaluate_polynomial_on_hypercube(p: &MLPolynomial) -> HashMap<String, F> {
     let num_vars = p.num_vars();
     (0..(2_u64.pow(num_vars as u32)))
         .map(|n|number_to_bit_string(n, num_vars))
