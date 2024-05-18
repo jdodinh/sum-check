@@ -9,7 +9,6 @@ mod field;
 mod polynomial;
 
 fn main() {
-
     /// The protocol works any time 'poly' is a list of multilinear polynomials. The polynomial used
     /// is the product of these polynomials.
     let poly: ProductMLPolynomial = vec![
