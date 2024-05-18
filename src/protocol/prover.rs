@@ -13,14 +13,13 @@ pub struct ProverState {
     maps: Vec<EvalTable>,
 }
 
-type EvalTable = HashMap<String, F>;
 
 pub struct Prover {
 }
 
 impl Prover {
 
-    pub fn claim_sum(poly: &MVMLPolynomial) -> (F, ProverState) {
+    pub fn claim_sum(poly: &ProductMLPolynomial) -> (F, ProverState) {
         let num_vars = get_num_vars(&poly).unwrap();
         let initial_state = ProverState {
             last_round: 0,
