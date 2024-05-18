@@ -3,13 +3,13 @@ use ark_ff::Field;
 use ark_std::{UniformRand};
 use rand::thread_rng;
 use crate::field::Field64 as F;
-use crate::polynomial::{evaluate_mvml_polynomial, PolynomialDescription, MVMLPolynomial};
+use crate::polynomial::{evaluate_mvml_polynomial, PolynomialDescription, ProductMLPolynomial};
 use crate::protocol::rejection::RejectError;
 
 pub struct VerifierState {
     pub last_round: usize,
     pub num_polys: usize,
-    pub poly: MVMLPolynomial,
+    pub poly: ProductMLPolynomial,
     pub claimed_sum: F,
     pub running_eval: F,
     pub randomness: Vec<F>,
@@ -19,7 +19,7 @@ pub struct Verifier{
 }
 
 impl Verifier {
-    pub fn initialize(poly: &MVMLPolynomial, claimed: F) -> VerifierState {
+    pub fn initialize(poly: &ProductMLPolynomial, claimed: F) -> VerifierState {
         VerifierState{
             last_round: 0,
             num_polys: poly.len(),
@@ -30,6 +30,8 @@ impl Verifier {
         }
     }
 
+    /// Execute a round of the verifier. First it checks the consistency with the previous checks,
+    /// then generates randomness and returns its updated state, as well as the randomness.
     pub fn round(state: VerifierState, mvml_desc: PolynomialDescription) -> Result<(F, VerifierState), RejectError> {
         if Self::evaluate_intermediate(&mvml_desc).ne(&state.running_eval) {
             return Err(RejectError::new("Rejecting the Prover's claim!"));
@@ -47,10 +49,12 @@ impl Verifier {
         return Ok((r, new_state))
     }
 
+    /// Evaluate p(0) + p(1).
     pub fn evaluate_intermediate(mvml_desc: &PolynomialDescription) -> F{
         mvml_desc.get(0).unwrap().add(mvml_desc.get(1).unwrap())
     }
 
+    /// Evaluate the polynomial at a random point thanks to Lagrange interpolation.
     pub fn evaluate_at_random_point(mvml_descr: &PolynomialDescription, r: F) -> F{
         let k = mvml_descr.len() - 1;
         let mut result = F::ZERO;
@@ -74,7 +78,8 @@ impl Verifier {
         result
     }
 
-
+    /// Last check to see if the polynomial evaluated at a random point agrees with the prover's
+    /// messages.
     pub fn sanity_check(state: VerifierState) -> (bool, Vec<F>) {
         (evaluate_mvml_polynomial(state.poly, &state.randomness).eq(&state.running_eval), state.randomness)
     }
