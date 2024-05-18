@@ -8,18 +8,26 @@ use rand::{thread_rng};
 
 use crate::field::Field64 as F;
 
+/// Type for a multilinear polynomial.
 pub type MLPolynomial = SparsePolynomial<F, SparseTerm>;
 
+/// Type for a product of multilinear polynomials.
+pub type ProductMLPolynomial = Vec<MLPolynomial>;
+
+/// 'Enough' evaluation points of a univariate polynomial for perfect Lagrange interpolation.
 pub type PolynomialDescription = Vec<F>;
 
-pub type MVMLPolynomial = Vec<MLPolynomial>;
+/// Type for the evaluation table of a polynomial.
+pub type EvalTable = HashMap<String, F>;
 
-
-pub fn evaluate_mvml_polynomial(mvml_polynomial: MVMLPolynomial, point: &Vec<F>) -> F {
+/// Evaluates a ProductMLPolynomial at 'point'
+pub fn evaluate_mvml_polynomial(mvml_polynomial: ProductMLPolynomial, point: &Vec<F>) -> F {
     mvml_polynomial.iter().map(|ml_polynomial|ml_polynomial.evaluate(&point)).fold(F::ONE, F::mul)
 }
 
-pub fn get_num_vars(multilinears: &MVMLPolynomial) -> Option<usize> {
+/// Returns an optional number of variables in a ProductMLPolynomial. Is None if number of variables
+/// is not the same in each polynomial.
+pub fn get_num_vars(multilinears: &ProductMLPolynomial) -> Option<usize> {
     match multilinears.as_slice() {
         [head, tail @ ..] => tail
             .iter()
@@ -29,7 +37,8 @@ pub fn get_num_vars(multilinears: &MVMLPolynomial) -> Option<usize> {
     }
 }
 
-pub fn evaluate_polynomial_on_hypercube(p: &MLPolynomial) -> HashMap<String, F> {
+/// Obtain the evaluation table on the binary hypercube for a multilinear polynomial.
+pub fn evaluate_polynomial_on_hypercube(p: &MLPolynomial) -> EvalTable {
     let num_vars = p.num_vars();
     (0..(2_u64.pow(num_vars as u32)))
         .map(|n|number_to_bit_string(n, num_vars))
@@ -37,10 +46,12 @@ pub fn evaluate_polynomial_on_hypercube(p: &MLPolynomial) -> HashMap<String, F> 
         .collect::<HashMap<String, F>>()
 }
 
+/// Convents a u64 number to its corresponding bit string.
 pub fn number_to_bit_string(number: u64, num_vars: usize) -> String {
     format!("{number:032b}").split_off(32-num_vars)
 }
 
+/// Convents a bit string to the corresponding vector of field elements.
 fn bit_string_to_vector(bit_string: String) -> Vec<F> {
     bit_string.as_bytes().iter().map(|&b| F::from(b%2)).collect::<Vec<F>>()
 }
