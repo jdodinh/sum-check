@@ -9,9 +9,8 @@ mod field;
 mod polynomial;
 
 fn main() {
-
-    /// The protocol works any time 'poly' is a list of multilinear polynomials. The polynomial used
-    /// is the product of these polynomials.
+    // The protocol works any time 'poly' is a list of multilinear polynomials. The polynomial used
+    // is the product of these polynomials.
     let poly: ProductMLPolynomial = vec![
         SparsePolynomial::from_coefficients_vec(
             3,
@@ -45,3 +44,4 @@ fn main() {
         println!("The verifier accepts the claim.");
     }
 }
+
