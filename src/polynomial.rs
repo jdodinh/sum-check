@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 use ark_ff::Field;
 use std::ops::Mul;
-use ark_poly::{multivariate::{SparsePolynomial, SparseTerm, Term}, DenseMVPolynomial, Polynomial};
-
-use ark_std::{UniformRand};
-use rand::{thread_rng};
+use ark_poly::{multivariate::{SparsePolynomial, SparseTerm}, DenseMVPolynomial, Polynomial};
 
 use crate::field::Field256 as F;
 
@@ -58,9 +55,13 @@ fn bit_string_to_vector(bit_string: String) -> Vec<F> {
 
 #[cfg(test)]
 mod tests {
+
+    use ark_std::{UniformRand};
+    use rand::{thread_rng};
     use ark_ff::Field;
     use ark_poly::Polynomial;
     use super::*;
+    use ark_poly::multivariate::Term;
 
     #[test]
     fn test_polynomial_equality() {
