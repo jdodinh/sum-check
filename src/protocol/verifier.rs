@@ -8,9 +8,7 @@ use crate::protocol::rejection::RejectError;
 
 pub struct VerifierState {
     pub last_round: usize,
-    pub num_polys: usize,
     pub poly: ProductMLPolynomial,
-    pub claimed_sum: F,
     pub running_eval: F,
     pub randomness: Vec<F>,
 }
@@ -22,9 +20,7 @@ impl Verifier {
     pub fn initialize(poly: &ProductMLPolynomial, claimed: F) -> VerifierState {
         VerifierState{
             last_round: 0,
-            num_polys: poly.len(),
             poly: poly.clone(),
-            claimed_sum: claimed,
             running_eval: claimed,
             randomness: Vec::new(),
         }

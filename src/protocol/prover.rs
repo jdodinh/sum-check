@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::ops::{Add, Mul, Sub};
 use ark_ff::Field;
-use ark_poly::multivariate::{SparsePolynomial, SparseTerm};
 use ark_std::iterable::Iterable;
 use crate::field::Field256 as F;
 use crate::polynomial::*;
@@ -108,40 +107,12 @@ fn combine_table_elements(bit_string: String, r: F, table: &EvalTable) -> F {
     return a0.sub(&r.mul(a0)).add(&r.mul(a1))
 }
 
-fn collapse_map(map: &HashMap<String, F>) -> (F, F) {
-    map.iter()
-        .fold((F::from(0), F::from(0)), |acc, kv| add_to_acc(acc, kv))
-}
-
-fn add_to_acc((acc0, acc1): (F, F), (k, v): (&String, &F)) -> (F, F){
-    if k.starts_with("0") {
-        (acc0.add(v), acc1)
-    } else {
-        (acc0, acc1.add(v))
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use ark_poly::DenseMVPolynomial;
     use ark_poly::multivariate::Term;
     use super::*;
-
-    #[test]
-    fn test_collapse_map() {
-        let our_map = HashMap::from([
-            ("000".to_owned(), F::from(67)),
-            ("001".to_owned(), F::from(9)),
-            ("010".to_owned(), F::from(28)),
-            ("011".to_owned(), F::from(31)),
-            ("100".to_owned(), F::from(93)),
-            ("101".to_owned(), F::from(21)),
-            ("110".to_owned(), F::from(72)),
-            ("111".to_owned(), F::from(95)),
-        ]);
-        let p = collapse_map(&our_map);
-        assert_eq!(p, (F::from(135), F::from(281)))
-    }
+    use ark_poly::multivariate::{SparsePolynomial, SparseTerm};
 
     #[test]
     fn test_reduce_map() {

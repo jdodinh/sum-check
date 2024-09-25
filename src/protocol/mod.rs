@@ -1,4 +1,3 @@
-use ark_poly::{multivariate::{SparsePolynomial, SparseTerm, Term}, DenseMVPolynomial};
 use crate::field::Field256 as F;
 use crate::polynomial::{get_num_vars, PolynomialDescription, ProductMLPolynomial};
 use crate::protocol::prover::{Prover, ProverState};
@@ -10,7 +9,7 @@ mod rejection;
 
 
 pub struct ProtocolTranscript {
-    randomness: Vec<F>,
+    _randomness: Vec<F>,
     pub accept: bool,
 }
 
@@ -34,12 +33,12 @@ pub fn orchestrate_protocol(num_vars: usize,
             Ok((r, state)) => {
                 verifier_state = state;
                 prover_state = Prover::round_phase_2(prover_state, r) },
-            Err(_) => return ProtocolTranscript{ randomness: vec![], accept: false}
+            Err(_) => return ProtocolTranscript{ _randomness: vec![], accept: false}
         }
     }
-    let (accept, randomness) = Verifier::sanity_check(verifier_state);
+    let (accept, _randomness) = Verifier::sanity_check(verifier_state);
     ProtocolTranscript{
-        randomness,
+        _randomness,
         accept
     }
 }
@@ -47,7 +46,8 @@ pub fn orchestrate_protocol(num_vars: usize,
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    use ark_poly::{multivariate::{SparsePolynomial, SparseTerm}, DenseMVPolynomial};
+    use ark_poly::multivariate::Term;
     /// Basic test for a multilinear polynomial on 3 variables.
     #[test]
     fn test_protocol_3_variables() {
@@ -118,7 +118,7 @@ mod tests {
         let (num_vars, claimed_sum, prover_state, verifier_state) = setup_protocol(&poly);
         let transcript = orchestrate_protocol(num_vars, claimed_sum, prover_state, verifier_state);
         assert!(!transcript.accept);
-        assert_eq!(transcript.randomness.len(), 6)
+        assert_eq!(transcript._randomness.len(), 6)
 
     }
 
@@ -152,7 +152,7 @@ mod tests {
         let (num_vars, claimed_sum, prover_state, verifier_state) = setup_protocol(&poly);
         let transcript = orchestrate_protocol(num_vars, claimed_sum, prover_state, verifier_state);
         assert!(transcript.accept);
-        assert_eq!(transcript.randomness.len(), 1)
+        assert_eq!(transcript._randomness.len(), 1)
 
     }
 
@@ -174,7 +174,7 @@ mod tests {
         };
         let transcript = orchestrate_protocol(num_vars, claimed_sum, prover_state, alt_verifier_state);
         assert!(!transcript.accept);
-        assert_eq!(transcript.randomness.len(), 0)
+        assert_eq!(transcript._randomness.len(), 0)
     }
 
 
@@ -286,7 +286,7 @@ mod tests {
         };
         let transcript = orchestrate_protocol(num_vars, claimed_sum, prover_state, alt_verifier_state);
         assert!(!transcript.accept);
-        assert_eq!(transcript.randomness.len(), 0);
+        assert_eq!(transcript._randomness.len(), 0);
     }
 
 
