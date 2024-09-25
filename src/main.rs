@@ -1,4 +1,4 @@
-use crate::field::Field64 as F;
+use crate::field::Field256 as F;
 use crate::polynomial::ProductMLPolynomial;
 use crate::protocol::*;
 use ark_poly::multivariate::{SparsePolynomial, SparseTerm, Term};

@@ -1,5 +1,5 @@
 use ark_poly::{multivariate::{SparsePolynomial, SparseTerm, Term}, DenseMVPolynomial};
-use crate::field::Field64 as F;
+use crate::field::Field256 as F;
 use crate::polynomial::{get_num_vars, PolynomialDescription, ProductMLPolynomial};
 use crate::protocol::prover::{Prover, ProverState};
 use crate::protocol::verifier::{Verifier, VerifierState};
