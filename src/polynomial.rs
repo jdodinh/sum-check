@@ -6,7 +6,7 @@ use ark_poly::{multivariate::{SparsePolynomial, SparseTerm, Term}, DenseMVPolyno
 use ark_std::{UniformRand};
 use rand::{thread_rng};
 
-use crate::field::Field64 as F;
+use crate::field::Field256 as F;
 
 /// Type for a multilinear polynomial.
 pub type MLPolynomial = SparsePolynomial<F, SparseTerm>;

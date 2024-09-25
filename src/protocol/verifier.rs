@@ -2,7 +2,7 @@ use std::ops::{Add, Mul};
 use ark_ff::Field;
 use ark_std::{UniformRand};
 use rand::thread_rng;
-use crate::field::Field64 as F;
+use crate::field::Field256 as F;
 use crate::polynomial::{evaluate_mvml_polynomial, PolynomialDescription, ProductMLPolynomial};
 use crate::protocol::rejection::RejectError;
 

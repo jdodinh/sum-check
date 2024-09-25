@@ -3,7 +3,7 @@ use std::ops::{Add, Mul, Sub};
 use ark_ff::Field;
 use ark_poly::multivariate::{SparsePolynomial, SparseTerm};
 use ark_std::iterable::Iterable;
-use crate::field::Field64 as F;
+use crate::field::Field256 as F;
 use crate::polynomial::*;
 
 pub struct ProverState {
