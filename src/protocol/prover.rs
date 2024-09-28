@@ -24,11 +24,11 @@ impl Prover {
         };
         let mut claim = F::ZERO;
         let mut product;
-        for b in 0..1 << num_vars {
+        for pt in 0..1 << num_vars as usize {
             product = initial_state
                 .maps
                 .iter()
-                .map(|m| m.get(b as usize).unwrap())
+                .map(|m| m.get(pt).unwrap())
                 .fold(F::ONE, F::mul);
             claim += product;
         }
@@ -38,20 +38,17 @@ impl Prover {
     pub fn round_phase_1(state: ProverState) -> (PolynomialDescription, ProverState) {
         let num_vars = state.num_vars - state.last_round - 1;
         let mut polynomial_points: PolynomialDescription = vec![F::ZERO; state.num_polys + 1];
-        for b in 0..1 << num_vars {
+        for pt in 0..1 << num_vars as usize {
             polynomial_points = polynomial_points
                 .iter()
-                .zip(
-                    Self::get_polynomial_points(&state, b as usize, (b + (1 << num_vars)) as usize)
-                        .iter(),
-                )
+                .zip(Self::get_polynomial_points(&state, pt, pt + (1 << num_vars)).iter())
                 .map(|(&b, &v)| b.add(v))
                 .collect();
         }
         return (polynomial_points, state);
     }
 
-    fn get_polynomial_points(state: &ProverState, b0: usize, b1: usize) -> PolynomialDescription {
+    fn get_polynomial_points(state: &ProverState, pt0: usize, pt1: usize) -> PolynomialDescription {
         let mut poly_description: PolynomialDescription = vec![F::ONE; state.num_polys + 1];
         for k in 0..state.num_polys {
             poly_description = poly_description
@@ -59,8 +56,8 @@ impl Prover {
                 .zip(
                     Self::get_polynomial_descr_points(
                         state.maps.get(k).unwrap(),
-                        b0,
-                        b1,
+                        pt0,
+                        pt1,
                         state.num_polys,
                     )
                     .iter(),
@@ -73,8 +70,8 @@ impl Prover {
 
     fn get_polynomial_descr_points(
         eval_table: &EvalTable,
-        b0: usize,
-        b1: usize,
+        pt0: usize,
+        pt1: usize,
         num_polys: usize,
     ) -> PolynomialDescription {
         let mut points: PolynomialDescription = Vec::new();
@@ -82,8 +79,8 @@ impl Prover {
         let mut t1: &F;
         let mut jf: F;
         for j in 0..=num_polys {
-            t0 = eval_table.get(b0).unwrap();
-            t1 = eval_table.get(b1).unwrap();
+            t0 = eval_table.get(pt0).unwrap();
+            t1 = eval_table.get(pt1).unwrap();
             jf = F::from(j as u16);
             points.push(*t0 - (jf * t0) + (jf * t1))
         }
@@ -110,14 +107,14 @@ fn reduce(num_vars: usize, r: F, tables: &Vec<EvalTable>) -> Vec<EvalTable> {
 }
 
 fn reduce_map(num_vars: usize, r: F, map: &Vec<F>) -> EvalTable {
-    (0..(1 << num_vars))
-        .map(|bit| (combine_table_elements(bit as usize, num_vars, r, map)))
+    (0..(1 << num_vars) as usize)
+        .map(|pt| (combine_table_elements(pt, pt + (1 << num_vars), r, map)))
         .collect::<Vec<F>>()
 }
 
-fn combine_table_elements(bit: usize, num_vars: usize, r: F, table: &EvalTable) -> F {
-    let a0 = table.get(bit).unwrap();
-    let a1 = table.get(bit + (1 << num_vars) as usize).unwrap();
+fn combine_table_elements(pt0: usize, pt1: usize, r: F, table: &EvalTable) -> F {
+    let a0 = table.get(pt0).unwrap();
+    let a1 = table.get(pt1).unwrap();
     return *a0 - (r * a0) + (r * a1);
 }
 

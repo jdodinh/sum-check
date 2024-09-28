@@ -42,8 +42,8 @@ pub fn get_num_vars(multilinears: &ProductMLPolynomial) -> Option<usize> {
 /// Obtain the evaluation table on the binary hypercube for a multilinear polynomial.
 pub fn evaluate_polynomial_on_hypercube(p: &MLPolynomial) -> EvalTable {
     let num_vars = p.num_vars();
-    (0..(1 << num_vars))
-        .map(|n| usize_to_binary_vector(n as usize, num_vars))
+    (0..(1 << num_vars) as usize)
+        .map(|n| usize_to_binary_vector(n, num_vars))
         .map(|binary| p.evaluate(&binary))
         .collect::<Vec<F>>()
 }
